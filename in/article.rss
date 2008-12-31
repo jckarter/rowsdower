@@ -1,0 +1,10 @@
+<item>
+<title>${TITLE}</title>
+<link>${URL}</link>
+<description>
+${BODY}
+</description>
+<dc:creator>Zap Rowsdower</dc:creator>
+<dc:date>${DATE}</dc:date>
+<guid>${GUID}</guid>
+</item>
