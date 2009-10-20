@@ -49,13 +49,16 @@ MEMO: template-contents ( template -- contents ) utf8 file-contents ;
 : expand-template ( template assoc -- string )
     [ template-contents ] dip [ replace-template-arg ] assoc-each ;
 
+: unknown-zone ( gmt-offset -- string )
+    [ number>string ] keep 0 > [ CHAR: + prefix ] when "GMT" prepend ;
+    
 : duration>timezone-name ( duration -- string )
     hour>> {
         { -5 [ "CDT" ] }
         { -6 [ "CST" ] }
         { -7 [ "PDT" ] }
         { -8 [ "PST" ] }
-        [ "wtf" throw ]
+        [ unknown-zone ]
     } case ;
 
 : format-time ( timestamp -- string )
