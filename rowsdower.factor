@@ -5,8 +5,8 @@ io.pathnames kernel locals math math.order math.parser memoize
 sequences sorting strings xml.entities generalizations ;
 IN: rowsdower
 
-CONSTANT: dest-directory "resource:work/rowsdower/out"
-CONSTANT: source-directory "resource:work/rowsdower/in"
+CONSTANT: dest-directory "vocab:rowsdower/out"
+CONSTANT: source-directory "vocab:rowsdower/in"
 CONSTANT: site-title "Rowsdower's Blog"
 CONSTANT: site-root "http://rowsdower.example.ca/"
 
@@ -63,21 +63,21 @@ MEMO: template-contents ( template -- contents ) utf8 file-contents ;
         [ month>>  month-name                              " " append ]
         [ day>>    number>string append                    ", " append ]
         [ year>>   number>string append                    " " append ]
-        [ hour>>   number>string 2 CHAR: 0 pad-left append ":" append ]
-        [ minute>> number>string 2 CHAR: 0 pad-left append ":" append ]
-        [ second>> number>string 2 CHAR: 0 pad-left append " " append ]
+        [ hour>>   number>string 2 CHAR: 0 pad-head append ":" append ]
+        [ minute>> number>string 2 CHAR: 0 pad-head append ":" append ]
+        [ second>> number>string 2 CHAR: 0 pad-head append " " append ]
         [ gmt-offset>> duration>timezone-name append ]
     } cleave ;
 
 : format-time-rss ( timestamp -- string )
     0 hours convert-timezone
     {
-        [ year>>   number>string 4 CHAR: 0 pad-left        "-" append ]
-        [ month>>  number>string 2 CHAR: 0 pad-left append "-" append ]
-        [ day>>    number>string 2 CHAR: 0 pad-left append "T" append ]
-        [ hour>>   number>string 2 CHAR: 0 pad-left append ":" append ]
-        [ minute>> number>string 2 CHAR: 0 pad-left append ":" append ]
-        [ second>> number>string 2 CHAR: 0 pad-left append "+00:00" append ]
+        [ year>>   number>string 4 CHAR: 0 pad-head        "-" append ]
+        [ month>>  number>string 2 CHAR: 0 pad-head append "-" append ]
+        [ day>>    number>string 2 CHAR: 0 pad-head append "T" append ]
+        [ hour>>   number>string 2 CHAR: 0 pad-head append ":" append ]
+        [ minute>> number>string 2 CHAR: 0 pad-head append ":" append ]
+        [ second>> number>string 2 CHAR: 0 pad-head append "+00:00" append ]
     } cleave ;
 
 : article-template-args ( article -- assoc )
@@ -85,7 +85,7 @@ MEMO: template-contents ( template -- contents ) utf8 file-contents ;
         [ "TITLE" swap title>> 2array ]
         [ "DATE"  swap mtime>> format-time 2array ]
         [ "BODY"  swap article-contents 2array ]
-        [ "URL"   swap article-url 2array ] 
+        [ "URL"   swap article-url escape-quoted-string site-root prepend 2array ] 
     } cleave 4array >hashtable ;
 
 : article-feed-template-args ( article -- assoc )
@@ -112,7 +112,7 @@ MEMO: template-contents ( template -- contents ) utf8 file-contents ;
      10 take [ article-feed-body ] map concat ;
 
 : archive-entry ( article -- html )
-    [ title>> ] [ article-url "<a href=\"" "\">" surround ] bi "</a>" surround ;
+    [ title>> ] [ article-url escape-quoted-string site-root prepend "<a href=\"" "\">" surround ] bi "</a>" surround ;
 
 : archive-body ( articles -- html )
     [ archive-entry "<li>" "</li>\n" surround ] map concat
